@@ -38,9 +38,7 @@ n_cores <- detectCores() - 1
 
 # About 0.88 minutes per simulation
 
-intcpt_list <- list(c(0, 3.5, 5.5, 10), c(0, 4, 6, 12)
-     , c(0, 4, 6.5, 14)
-     )
+intcpt_list <- list(c(0, 3, 5), c(0, 3.5, 5.5), c(0, 4, 6))
 
 # K = 4 results saved as param_relax_prop_odds_rand_more
 

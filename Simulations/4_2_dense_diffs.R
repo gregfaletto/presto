@@ -60,7 +60,7 @@ set.seed(2390812)
 # Initialize parallel processing--only works on Mac or Unix
 n_cores <- detectCores() - 1
 
-intcpt_list <- list(c(0, 3.5, 5.5), c(0, 4, 6), c(0, 4, 6.5))
+intcpt_list <- list(c(0, 2.5, 4.5), c(0, 3, 5), c(0, 3.5, 5.5), c(0, 4, 6))
 
 param_relax_prop_odds_unif_more2 <- new_simulation("param_relax_prop_odds_unif_more2",
      "Relaxed Proportional Odds (Uniform noise)")
