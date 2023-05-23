@@ -147,12 +147,6 @@ relax_prop_odds_unif_model <- function(n, p, K, intercepts, beta, dev_size){
         beta <- beta[1:p]
     }
 
-    # stopifnot(is.numeric(dev_prob) | is.integer(dev_prob))
-    # stopifnot(!is.na(dev_prob))
-    # stopifnot(length(dev_prob) == 1)
-    # stopifnot(dev_prob >= 0)
-    # stopifnot(dev_prob <= 1)
-
     stopifnot(is.numeric(dev_size) | is.integer(dev_size))
     stopifnot(!is.na(dev_size))
     stopifnot(length(dev_size) == 1)
@@ -179,13 +173,6 @@ sim_relaxed_unif_prop_odds <- function(n, p, K, intercepts, beta, nsim,
     stopifnot(is.numeric(beta) | is.integer(beta))
     stopifnot(length(beta) == p)
 
-    # stopifnot(is.numeric(dev_prob) | is.integer(dev_prob))
-    # stopifnot(!is.na(dev_prob))
-    # stopifnot(length(dev_prob) == 1)
-    # stopifnot(dev_prob >= 0)
-    # stopifnot(dev_prob <= 1)
-
-
     # List we'll return: will be length nsim, and every element will be a
     # named list with elements X and y.
     ret_list <- list()
@@ -196,7 +183,6 @@ sim_relaxed_unif_prop_odds <- function(n, p, K, intercepts, beta, nsim,
 
         # If beta_mat that is generated results in negative probabilities,
         # try again with another random draw, up to 10 times before giving up
-
         ret_i <- NA
         n_tries <- 0
 
@@ -342,7 +328,6 @@ gen_sim_data_app_prediabetes <- function(df, test_prop, resp_name, resp_levels, 
         stopifnot(all(is.na(omitted_x)))
     }
     
-
     # Create design matrix and response matrix for ordinalNet
 
     X_ordnet <- model.matrix(x_formula, data=df)
@@ -369,13 +354,9 @@ gen_sim_data_app_prediabetes <- function(df, test_prop, resp_name, resp_levels, 
             prop=test_prop, n_attempts=100)
 
         X_ordnet_test <- ret_list$X_prop
-
         X_ordnet_train <- ret_list$X_comp
-
         y_test <- ret_list$y_prop
-
         y_train <- ret_list$y_comp
-
         train_inds <- ret_list$comp_inds
 
         rm(ret_list)
@@ -390,7 +371,6 @@ gen_sim_data_app_prediabetes <- function(df, test_prop, resp_name, resp_levels, 
         # No need for test df--will just extract coefficients
 
         # Check outputs
-
         stopifnot(ncol(X_ordnet_train) == ncol(X_ordnet_test))
 
         stopifnot(nrow(X_ordnet_train) == length(y_train))
@@ -494,7 +474,6 @@ gen_sim_data_app <- function(df, test_prop, resp_name, resp_levels, x_formula,
     
 
     # Create design matrix and response matrix for ordinalNet
-
     X_ordnet <- model.matrix(x_formula, data=df)
 
     stopifnot(nrow(X_ordnet) == nrow(df))
@@ -519,13 +498,9 @@ gen_sim_data_app <- function(df, test_prop, resp_name, resp_levels, x_formula,
             prop=test_prop, n_attempts=100)
 
         X_ordnet_test <- ret_list$X_prop
-
         X_ordnet_train <- ret_list$X_comp
-
         y_test <- ret_list$y_prop
-
         y_train <- ret_list$y_comp
-
         train_inds <- ret_list$comp_inds
 
         rm(ret_list)

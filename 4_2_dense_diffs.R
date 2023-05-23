@@ -1,12 +1,16 @@
 # setwd("/Users/gregfaletto/Documents/GitHub/presto")
 
-# dev.off()
+if(!is.null(dev.list())){
+     dev.off()
+}
 rm(list=ls())
 
 library(simulator)
 library(MASS)
 library(ordinalNet)
 library(parallel)
+library(cowplot)
+library(ggplot2)
 
 dir_main <- getwd()
 dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
@@ -49,7 +53,7 @@ dense_sim <- generate_model(dense_sim, relax_prop_odds_unif_model, n = 2500,
      p = 10, K = 4, intercepts=intcpt_list, beta = rep(2, 10), dev_size=0.5,
      vary_along=c("intercepts"))
 
-dense_sim <- simulate_from_model(dense_sim, nsim = 100, index = 1:n_cores)
+dense_sim <- simulate_from_model(dense_sim, nsim = 1, index = 1:n_cores)
 
 print("")
 print("")
@@ -72,9 +76,9 @@ print("")
 dense_sim <- run_method(dense_sim, list(logit_meth, prop_odds_meth, fused_polr),
      parallel=list(socket_names=n_cores))
 
-dense_sim <- evaluate(dense_sim,list(prop_rare_obs, rare_prob_mse_gen))
+dense_sim <- evaluate(dense_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
-save_simulation(dense_sim)
+# save_simulation(dense_sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
@@ -85,5 +89,5 @@ print(plot_eval(dense_sim, "rare_prob_mse_gen"))
 # Plot functions
 create_plots(dense_sim)
 
-
+df_sim_stats(dense_sim)
 

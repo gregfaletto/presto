@@ -1,12 +1,16 @@
 # setwd("/Users/gregfaletto/Documents/GitHub/presto")
 
-# dev.off()
+if(!is.null(dev.list())){
+     dev.off()
+}
 rm(list=ls())
 
 library(simulator)
 library(MASS)
 library(ordinalNet)
 library(parallel)
+library(cowplot)
+library(ggplot2)
 
 dir_main <- getwd()
 dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
@@ -29,6 +33,7 @@ setwd(dir_code)
 source("model_functions.R")
 source("method_functions.R")
 source("eval_functions.R")
+source("sim_eval_function.R")
 
 setwd(dir_main)
 
@@ -48,7 +53,7 @@ sparse_sim <- generate_model(sparse_sim, relax_prop_odds_model_rand, n = 2500,
           p = 10, K = 4, intercepts=intcpt_list, beta = rep(1, 10), dev_size=.5,
           dev_prob=1/3, vary_along=c("intercepts"))
 
-sparse_sim <- simulate_from_model(sparse_sim, nsim = 100, index = 1:n_cores)
+sparse_sim <- simulate_from_model(sparse_sim, nsim = 1, index = 1:n_cores)
 
 print("")
 print("")
@@ -71,9 +76,9 @@ print("")
 sparse_sim <- run_method(sparse_sim, list(logit_meth, prop_odds_meth,
      fused_polr), parallel=list(socket_names=n_cores))
 
-sparse_sim <- evaluate(sparse_sim, list(rare_prob_mse_gen))
+sparse_sim <- evaluate(sparse_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
-save_simulation(sparse_sim)
+# save_simulation(sparse_sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
@@ -81,7 +86,9 @@ print(t1 - t0)
 
 print(plot_eval(sparse_sim, "rare_prob_mse_gen"))
 
+create_plots(sparse_sim)
 
+df_sim_stats(sparse_sim)
 
 
 

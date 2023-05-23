@@ -1,4 +1,4 @@
-# setwd("/Users/gregfaletto/OneDrive - USC Marshall School of Business/Proportional odds generalization/Code/Data Application")
+# setwd("/Users/gregfaletto/Documents/GitHub/presto")
 
 if(!is.null(dev.list())){
      dev.off()
@@ -12,18 +12,15 @@ library(ordinalNet)
 library(MLDataR)
 library(parallel)
 library(ggplot2)
+library(cowplot)
 
 # Initialize parallel processing--only works on Mac or Unix
 n_cores <- detectCores() - 1
 
-
 dir_main <- getwd()
-dir_code <- "/Users/gregfaletto/OneDrive - USC Marshall School of Business/Proportional odds generalization/Code/ordinalNet modified/R"
-# dir_data <- "/Users/gregfaletto/Library/CloudStorage/OneDrive-USCMarshallSchoolofBusiness/Proportional odds generalization/Possible Data Sets/Sales conversion optimization"
-dir_sims <- "/Users/gregfaletto/OneDrive - USC Marshall School of Business/Proportional odds generalization/Code/Simulations"
+dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
+setwd(dir_ordnet)
 
-
-setwd(dir_code)
 source("cdIn.R")
 source("cdOut.R")
 source("links.R")
@@ -34,14 +31,14 @@ source("ordinalNet.R")
 source("ordinalNetCV.R")
 source("ordinalNetTune.R")
 
-setwd(dir_sims)
+setwd(dir_main)
+dir_code <- paste(dir_main, "/Simulations", sep="")
+setwd(dir_code)
 
 source("model_functions.R")
 source("method_functions.R")
 source("eval_functions.R")
-
-# Load functions
-source("data_app_funcs.R")
+source("sim_eval_function.R")
 
 setwd(dir_main)
 
@@ -77,13 +74,13 @@ sim <- new_simulation("prediabetes_data_app", "Data application") |>
           tune_prop=0, x_formula= ~ Age + Sex + IMD_Decile + BMI + HbA1C,
           omitted_x = NA, age_cutoff=as.list(5*(6:13)),
           vary_along="age_cutoff") |>
-     simulate_from_model(nsim = 5, index = 1:n_cores) |>
+     simulate_from_model(nsim = 1, index = 1:n_cores) |>
      run_method(list(prop_odds_data_analysis_vec, logit_meth_gen,
           fused_polr_data_analysis_vec), parallel=list(socket_names=n_cores))
 
-sim <- sim |> evaluate(list(cal_osce_gen_data_app, cal_osce_width_gen_data_app))
+sim <- sim |> evaluate(list(cal_osce_gen_data_app))
 
-save_simulation(sim)
+# save_simulation(sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
@@ -92,13 +89,10 @@ print(t1 - t0)
 plot_eval_by(sim, "cal_osce_gen_data_app", varying = "age_cutoff") +
      xlab("Age cutoff") + ggtitle(NULL) + ylab("Estimated Rare Probability MSE")
 
-tabulate_eval(sim, "cal_osce_gen_data_app", se_format="None", digits=3)
+tabulate_eval(sim, "cal_osce_gen_data_app", se_format="None",
+     format_args=list(digits=3))
 
+# create_data_app_plots(sim)
 
-setwd("/Users/gregfaletto/Dropbox/Jacob and Greg/AISTATS 2023")
-source("sim_eval_function.R")
-setwd(dir_main)
-create_data_app_plots(sim)
-
-
+# df_data_app_stats(sim)
 
