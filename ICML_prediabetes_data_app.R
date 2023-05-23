@@ -15,7 +15,13 @@ library(ggplot2)
 library(cowplot)
 
 # Initialize parallel processing--only works on Mac or Unix
-n_cores <- detectCores() - 1
+n_cores <- 7
+stopifnot(n_cores <= detectCores())
+if(n_cores == 7){
+     nsims <- 5
+} else{
+     nsims <- 35
+}
 
 dir_main <- getwd()
 dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
@@ -74,7 +80,7 @@ sim <- new_simulation("prediabetes_data_app", "Data application") |>
           tune_prop=0, x_formula= ~ Age + Sex + IMD_Decile + BMI + HbA1C,
           omitted_x = NA, age_cutoff=as.list(5*(6:13)),
           vary_along="age_cutoff") |>
-     simulate_from_model(nsim = 1, index = 1:n_cores) |>
+     simulate_from_model(nsim = nsims, index = 1:n_cores) |>
      run_method(list(prop_odds_data_analysis_vec, logit_meth_gen,
           fused_polr_data_analysis_vec), parallel=list(socket_names=n_cores))
 

@@ -42,7 +42,13 @@ t0 <- Sys.time()
 set.seed(2390812)
 
 # Initialize parallel processing--only works on Mac or Unix
-n_cores <- detectCores() - 1
+n_cores <- 7
+stopifnot(n_cores <= detectCores())
+if(n_cores == 7){
+     nsims <- 100
+} else{
+     nsims <- 700
+}
 
 intcpt_list <- list(c(0, 2.5, 4.5), c(0, 3, 5), c(0, 3.5, 5.5), c(0, 4, 6))
 
@@ -53,7 +59,7 @@ dense_sim <- generate_model(dense_sim, relax_prop_odds_unif_model, n = 2500,
      p = 10, K = 4, intercepts=intcpt_list, beta = rep(2, 10), dev_size=0.5,
      vary_along=c("intercepts"))
 
-dense_sim <- simulate_from_model(dense_sim, nsim = 1, index = 1:n_cores)
+dense_sim <- simulate_from_model(dense_sim, nsim = nsims, index = 1:n_cores)
 
 print("")
 print("")
