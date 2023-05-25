@@ -240,10 +240,10 @@ eigensim2 <- new_simulation("eigensim2", "Theorem 2.3 Assumption Simulation") |>
         generate_model(eigenmodel, n=n, p=p,
             rare_prob=as.list(c(0, 10^(seq(-7, -5, by=1)))),
             beta=rep(1, p), K=K
-            # , corr=as.list(c(0, 0.25, 0.5, 0.75)),
-            # vary_along=c("rare_prob", "corr")
-            , corr= 0.75,
-            vary_along=c("rare_prob")
+            , corr=as.list(c(0, 0.25, 0.5, 0.75)),
+            vary_along=c("rare_prob", "corr")
+            # , corr= 0.75,
+            # vary_along=c("rare_prob")
             ) |> 
         simulate_from_model(nsim = nsims,
             , index = 1:n_cores
@@ -259,7 +259,7 @@ save_simulation(eigensim2)
 
 # plot_eval(eigensim2, "eigeneval")
 
-eigenplot1 <- plot_eval_by(eigensim2, "eigeneval", varying="rare_prob",
+eigenplot4 <- plot_eval_by(eigensim2, "eigeneval", varying="rare_prob",
     include_zero=TRUE
     # , spread_aggregator=conf_int_agg
     ) +
@@ -269,50 +269,89 @@ eigenplot1 <- plot_eval_by(eigensim2, "eigeneval", varying="rare_prob",
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0.75")
 
+print(eigenplot4)
+
+eigenplot1 <- subset_simulation(eigensim, corr==0) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0")
+
+print(eigenplot1)
+
+eigenplot2 <- subset_simulation(eigensim, corr==0.25) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.25")
+
+print(eigenplot2)
+
+eigenplot3 <- subset_simulation(eigensim, corr==0.5) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.5")
+
+print(eigenplot3)
 
 
-# eigenplot1 <- subset_simulation(eigensim, corr==0) |>
-#     plot_eval_by("eigeneval", varying="rare_prob",
-#     include_zero=TRUE) +
-#     scale_x_log10() +
-#     # scale_y_log10() + 
-#     geom_hline(yintercept=0, color="red", linetype="dashed") +
-#     xlab("Rare Class Probability") + theme(legend.position="none") +
-#     ggtitle("Correlation = 0")
 
-# print(eigenplot1)
 
-# eigenplot2 <- subset_simulation(eigensim, corr==0.25) |>
-#     plot_eval_by("eigeneval", varying="rare_prob",
-#     include_zero=TRUE) +
-#     scale_x_log10() +
-#     # scale_y_log10() + 
-#     geom_hline(yintercept=0, color="red", linetype="dashed") +
-#     xlab("Rare Class Probability") + theme(legend.position="none") +
-#     ggtitle("Correlation = 0.25")
 
-# print(eigenplot2)
+# Plots for condition being satisfied
+cond_plot_1 <- subset_simulation(eigensim, corr==0) |>
+    plot_eval_by("eigeneval2", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    # geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0")
 
-# eigenplot3 <- subset_simulation(eigensim, corr==0.5) |>
-#     plot_eval_by("eigeneval", varying="rare_prob",
-#     include_zero=TRUE) +
-#     scale_x_log10() +
-#     # scale_y_log10() + 
-#     geom_hline(yintercept=0, color="red", linetype="dashed") +
-#     xlab("Rare Class Probability") + theme(legend.position="none") +
-#     ggtitle("Correlation = 0.5")
+print(cond_plot_1)
 
-# print(eigenplot3)
+cond_plot_2 <- subset_simulation(eigensim, corr==0.25) |>
+    plot_eval_by("eigeneval2", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    # geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.25")
 
-# subset_simulation(eigensim, corr==0) |>
-#     plot_eval_by("eigeneval2", varying="rare_prob",
-#     include_zero=TRUE) +
-#     scale_x_log10() +
-#     # scale_y_log10() + 
-#     # geom_hline(yintercept=0, color="red", linetype="dashed") +
-#     xlab("Rare Class Probability") + theme(legend.position="none") +
-#     ggtitle("Correlation = 0")
+print(cond_plot_2)
 
+cond_plot_3 <- subset_simulation(eigensim, corr==0.5) |>
+    plot_eval_by("eigeneval2", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    # geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.5")
+
+print(cond_plot_3)
+
+cond_plot_4 <- subset_simulation(eigensim, corr==0.75) |>
+    plot_eval_by("eigeneval2", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    # scale_y_log10() + 
+    # geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.75 ")
+
+print(cond_plot_4)
 
 print("Total time:")
 print(Sys.time() - t0)

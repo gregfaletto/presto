@@ -10,6 +10,7 @@ library(MASS)
 library(parallel)
 library(cowplot)
 library(ggplot2)
+library(stargazer)
 
 dir_main <- getwd()
 dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
@@ -44,7 +45,7 @@ set.seed(2390812)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 100
+     nsims <- 1
 } else{
      nsims <- 700
 }
@@ -96,17 +97,37 @@ print("")
 
 sparse_sim <- evaluate(sparse_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
-save_simulation(sparse_sim)
+# save_simulation(sparse_sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-create_sparse_plot2(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr")), plots=c(3))
+sparse_plots_1_2 <- create_sparse_plots(subset_simulation(sparse_sim,
+     methods=c("logit_meth", "prop_odds_meth", "fused_polr")))
 
-create_sparse_plot2(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr")), plots=c(4))
+# Figure 1 or 6;
+fig_6 <- sparse_plots_1_2$main_plot
+
+# Figure 5 or 7;
+fig_7 <- sparse_plots_1_2$supp_plot
+
+sparse_plots_1_3 <- create_sparse_plots(subset_simulation(sparse_sim,
+     methods=c("logit_meth", "prop_odds_meth", "fused_polr")), plots=c(2, 4, 6))
+
+# Figure 1 or 6;
+fig_1 <- sparse_plots_1_3$main_plot
+
+# Figure 5 or 7;
+fig_5 <- sparse_plots_1_3$supp_plot
+
+
+
+# Need to figure out which plots to use for these two plots that include
+# ridge PRESTO; ALSO NEED TO FIGURE OUT TABLE TO MAKE
+create_sparse_plot2(sparse_sim, plots=c(3))
+
+create_sparse_plot2(sparse_sim, plots=c(4))
 
 ret <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
      "prop_odds_meth", "fused_polr")),
@@ -114,8 +135,10 @@ ret <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
           # , "lasso_logit"
           ))
 
+# Table 3
 stargazer(ret$t_d_df, summary=FALSE)
 
+# Table 4
 stargazer(ret$summary_df, summary=FALSE)
 
 # create_sparse_plots()

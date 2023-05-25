@@ -407,3 +407,54 @@ create_plot2 <- function(sim){
   
   return(plot_1)
 }
+
+create_sparse_plots <- function(sim, plots=c(1,3,5)){
+  require(cowplot)
+  require(ggplot2)
+
+  stopifnot(length(plots) == 3)
+  
+  # sim <- sim |> evaluate(list(rare_prob_mse_gen, prop_rare_obs))
+  
+  rare_probs <- round(100*rare_probs(sim), plots[2])
+  
+  titles <- paste("Rare Proportion: ", rare_probs, "%", sep="")
+  
+  # main text plot
+  
+  boxplot_2 <- sim |> subset_simulation(subset=plots[2]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[2]]) + xlab(NULL) +
+    scale_y_log10()
+  
+  e_df <- as.data.frame(evals(sim))
+  stopifnot("rare_prob_mse_gen" %in% colnames(e_df))
+  stopifnot("prop_rare_obs" %in% colnames(e_df))
+  
+  ratio_plot_1 <- sim |> subset_simulation(subset=plots[1]) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[plots[1]]) + xlab(NULL)
+  
+  ratio_plot_2 <- sim |> subset_simulation(subset=plots[2]) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[plots[2]]) + xlab(NULL)
+  
+  ratio_plot_3 <- sim |> subset_simulation(subset=plots[3]) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[plots[3]]) + xlab(NULL)
+  
+  plot_1 <- plot_grid(boxplot_2, ratio_plot_2, ratio_plot_3, ratio_plot_1,
+                      ncol = 2, nrow = 2)
+  
+  # supplement plot
+  
+  boxplot_1 <- sim |> subset_simulation(subset=plots[1]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[1]]) + xlab(NULL) +
+    scale_y_log10()
+  
+  
+  boxplot_3 <- sim |> subset_simulation(subset=plots[3]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[3]]) + xlab(NULL) +
+    scale_y_log10()
+  
+  
+  supp_plot <- plot_grid(boxplot_1, boxplot_3, ncol = 2, nrow = 1)
+  
+  return(list(main_plot=plot_1, supp_plot=supp_plot))
+}

@@ -11,6 +11,7 @@ library(ordinalNet)
 library(parallel)
 library(cowplot)
 library(ggplot2)
+library(stargazer)
 
 dir_main <- getwd()
 dir_ordnet <- paste(dir_main, "/ordinalNet modified", sep="")
@@ -45,7 +46,7 @@ set.seed(2390812)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 100
+     nsims <- 1
 } else{
      nsims <- 700
 }
@@ -56,7 +57,7 @@ dense_sim <- new_simulation("dense_sim",
      "Relaxed Proportional Odds (Uniform noise)")
 
 dense_sim <- generate_model(dense_sim, relax_prop_odds_unif_model, n = 2500,
-     p = 10, K = 4, intercepts=intcpt_list, beta = rep(2, 10), dev_size=0.5,
+     p = 10, K = 4, intercepts=intcpt_list, beta = rep(1, 20), dev_size=0.5,
      vary_along=c("intercepts"))
 
 dense_sim <- simulate_from_model(dense_sim, nsim = nsims, index = 1:n_cores)
@@ -92,8 +93,37 @@ print(t1 - t0)
 
 print(plot_eval(dense_sim, "rare_prob_mse_gen"))
 
-# Plot functions
-create_plots(dense_sim)
+# # Plot functions
+# create_plots(dense_sim)
 
-df_sim_stats(dense_sim)
+# df_sim_stats(dense_sim)
+
+dense_plots_1_2 <- create_sparse_plots(subset_simulation(dense_sim,
+     methods=c("logit_meth", "prop_odds_meth", "fused_polr")))
+
+# Figure 1 or 6;
+fig_6 <- dense_plots_1_2$main_plot
+
+# Figure 5 or 7;
+fig_7 <- dense_plots_1_2$supp_plot
+
+dense_plots_1_3 <- create_sparse_plots(subset_simulation(dense_sim,
+     methods=c("logit_meth", "prop_odds_meth", "fused_polr")), plots=c(2, 4, 6))
+
+# Figure 1 or 6;
+fig_1 <- dense_plots_1_3$main_plot
+
+# Figure 5 or 7;
+fig_5 <- dense_plots_1_3$supp_plot
+
+# create_plot2(dense_sim)
+
+ret <- df_sim_stats(dense_sim, methods_to_compare=c("logit_meth",
+     "prop_odds_meth"))
+
+# Table 1
+stargazer(ret$t_d_df, summary=FALSE)
+
+# Table 5
+stargazer(ret$summary_df, summary=FALSE)
 
