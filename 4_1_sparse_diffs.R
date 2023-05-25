@@ -102,11 +102,14 @@ print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-create_sparse_plot2(param_relax_prop_odds_rand_more_icml, plots=c(3))
+create_sparse_plot2(subset_simulation(sparse_sim, methods=c("logit_meth",
+     "prop_odds_meth", "fused_polr")), plots=c(3))
 
-create_sparse_plot2(param_relax_prop_odds_rand_more_icml, plots=c(4))
+create_sparse_plot2(subset_simulation(sparse_sim, methods=c("logit_meth",
+     "prop_odds_meth", "fused_polr")), plots=c(4))
 
-ret <- df_sim_stats(param_relax_prop_odds_rand_more_icml,
+ret <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
+     "prop_odds_meth", "fused_polr")),
      methods_to_compare=c("logit_meth", "prop_odds_meth"
           # , "lasso_logit"
           ))
