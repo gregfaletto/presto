@@ -7,7 +7,6 @@ rm(list=ls())
 
 library(simulator)
 library(MASS)
-library(ordinalNet)
 # MLDataR package contains data set
 library(MLDataR)
 library(parallel)
@@ -18,9 +17,9 @@ library(cowplot)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 5
+     nsims <- 7
 } else{
-     nsims <- 35
+     nsims <- 49
 }
 
 dir_main <- getwd()
@@ -86,7 +85,7 @@ sim <- new_simulation("prediabetes_data_app", "Data application") |>
 
 sim <- sim |> evaluate(list(cal_osce_gen_data_app))
 
-# save_simulation(sim)
+save_simulation(sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
@@ -97,8 +96,4 @@ plot_eval_by(sim, "cal_osce_gen_data_app", varying = "age_cutoff") +
 
 tabulate_eval(sim, "cal_osce_gen_data_app", se_format="None",
      format_args=list(digits=3))
-
-# create_data_app_plots(sim)
-
-# df_data_app_stats(sim)
 

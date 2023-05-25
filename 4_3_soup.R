@@ -7,7 +7,6 @@ rm(list=ls())
 
 library(simulator)
 library(MASS)
-library(ordinalNet)
 # ordinal package contains data set
 library(ordinal)
 library(parallel)
@@ -18,9 +17,9 @@ library(ggplot2)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 5
+     nsims <- 50
 } else{
-     nsims <- 35
+     nsims <- 350
 }
 
 dir_main <- getwd()
@@ -93,17 +92,15 @@ sim <- new_simulation("soup_data_app", "Data application") |>
 
 sim <- sim |> evaluate(list(cal_osce_gen_data_app))
 
-# save_simulation(sim)
+save_simulation(sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-print(plot_eval(sim, "cal_osce_gen_data_app"))
-
-tabulate_eval(sim, "cal_osce_gen_data_app")
-
+# Create plot for paper (Figure 3)
 create_data_app_plots(sim)
 
+# Generate sample means for paper (as reported in Section 4.3)
 df_data_app_stats(sim)
 
