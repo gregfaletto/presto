@@ -56,8 +56,8 @@ intcpt_list <- list(c(0, 3, 5), c(0, 3.5, 5.5), c(0, 4, 6))
 sparse_sim <- new_simulation("sparse_sim", "Relaxed Proportional Odds")
 
 sparse_sim <- generate_model(sparse_sim, relax_prop_odds_model_rand, n = 2500,
-          p = 10, K = 4, intercepts=intcpt_list, beta = rep(1, 10), dev_size=.5,
-          dev_prob=1/3, vary_along=c("intercepts"))
+          p = 10, K = 4, intercepts=intcpt_list, beta = rep(.5, 10), dev_size=.5,
+          dev_prob=list(1/3, 1/2), vary_along=c("intercepts", "dev_prob"))
 
 sparse_sim <- simulate_from_model(sparse_sim, nsim = nsims, index = 1:n_cores)
 
@@ -70,6 +70,8 @@ print("")
 print("")
 print("")
 print("Done generating data! Now running methods (in parallel)...")
+print("Time elapsed:")
+print(Sys.time() - t0)
 print("")
 print("")
 print("")
@@ -82,6 +84,16 @@ print("")
 sparse_sim <- run_method(sparse_sim, list(logit_meth, prop_odds_meth,
      fused_polr, fused_polr_l2), parallel=list(socket_names=n_cores))
 
+
+print("")
+print("")
+print("Done running methods! Now evaluating...")
+print("Time elapsed:")
+print(Sys.time() - t0)
+print("")
+print("")
+print("")
+
 sparse_sim <- evaluate(sparse_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
 save_simulation(sparse_sim)
@@ -90,14 +102,29 @@ print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-print(plot_eval(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr")), "rare_prob_mse_gen"))
+create_sparse_plot2(param_relax_prop_odds_rand_more_icml, plots=c(3))
 
-create_plots(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr"))
+create_sparse_plot2(param_relax_prop_odds_rand_more_icml, plots=c(4))
 
-df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr"))
+ret <- df_sim_stats(param_relax_prop_odds_rand_more_icml,
+     methods_to_compare=c("logit_meth", "prop_odds_meth"
+          # , "lasso_logit"
+          ))
+
+stargazer(ret$t_d_df, summary=FALSE)
+
+stargazer(ret$summary_df, summary=FALSE)
+
+# create_sparse_plots()
+
+# print(plot_eval(subset_simulation(sparse_sim, methods=c("logit_meth",
+#      "prop_odds_meth", "fused_polr")), "rare_prob_mse_gen"))
+
+# create_plots(subset_simulation(sparse_sim, methods=c("logit_meth",
+#      "prop_odds_meth", "fused_polr"))
+
+# df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
+#      "prop_odds_meth", "fused_polr"))
 
 
 

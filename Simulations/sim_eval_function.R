@@ -298,3 +298,112 @@ df_data_app_stats <- function(sim){
   return(mean_df)
   
 }
+
+create_sparse_plot2 <- function(sim, plots=c(1,3)){
+  require(cowplot)
+  require(ggplot2)
+
+  n_plots <- length(plots)
+
+  stopifnot(n_plots %in% c(1, 2))
+  
+  # sim <- sim |> evaluate(list(rare_prob_mse_gen, prop_rare_obs))
+  
+  rare_probs <- round(100*rare_probs(sim), 3)
+  
+  titles <- paste("Rare Proportion: ", rare_probs, "%", sep="")
+
+  print("titles:")
+  print(titles)
+  
+  # main text plot
+  
+  if(n_plots == 2){
+    boxplot_2 <- sim |> subset_simulation(subset=plots[2]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[2]]) + xlab(NULL) +
+    scale_y_log10()
+  }
+  
+  
+  e_df <- as.data.frame(evals(sim))
+  stopifnot("rare_prob_mse_gen" %in% colnames(e_df))
+  stopifnot("prop_rare_obs" %in% colnames(e_df))
+  
+  ratio_plot_1 <- sim |> subset_simulation(subset=plots[1]) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[plots[1]]) + xlab(NULL)
+  
+  if(n_plots == 2){
+    ratio_plot_2 <- sim |> subset_simulation(subset=plots[2]) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[plots[2]]) + xlab(NULL)
+  }
+  
+  
+  boxplot_1 <- sim |> subset_simulation(subset=plots[1]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[1]]) + xlab(NULL) +
+    scale_y_log10()
+  
+  if(n_plots == 2){
+    plot_1 <- plot_grid(boxplot_2, boxplot_1, ratio_plot_2, ratio_plot_1,
+                      ncol = 2, nrow = 2)
+    } else if(n_plots == 1){
+      plot_1 <- plot_grid(boxplot_1,ratio_plot_1,
+                      ncol = 2, nrow = 1)
+    }
+  
+
+  return(plot_1)
+}
+
+create_plot2 <- function(sim){
+  require(cowplot)
+  require(ggplot2)
+  
+  # sim <- sim |> evaluate(list(rare_prob_mse_gen, prop_rare_obs))
+  
+  rare_probs <- round(100*rare_probs(sim), 3)
+  
+  titles <- paste("Rare Proportion: ", rare_probs, "%", sep="")
+
+  print("titles:")
+  print(titles)
+  
+  # main text plot
+  
+  boxplot_2 <- sim |> subset_simulation(subset=2) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[2]) + xlab(NULL) +
+    scale_y_log10()
+  
+  e_df <- as.data.frame(evals(sim))
+  stopifnot("rare_prob_mse_gen" %in% colnames(e_df))
+  stopifnot("prop_rare_obs" %in% colnames(e_df))
+  
+  ratio_plot_1 <- sim |> subset_simulation(subset=1) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[1]) + xlab(NULL)
+  
+  ratio_plot_2 <- sim |> subset_simulation(subset=2) |> evals() |>
+    as.data.frame() |> plot_ratios(titles[2]) + xlab(NULL)
+  
+
+   boxplot_1 <- sim |> subset_simulation(subset=1) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[1]) + xlab(NULL) +
+    scale_y_log10()
+  # ratio_plot_3 <- sim |> subset_simulation(subset=3) |> evals() |>
+  #   as.data.frame() |> plot_ratios(titles[3]) + xlab(NULL)
+  
+  plot_1 <- plot_grid(boxplot_2, boxplot_1, ratio_plot_2, ratio_plot_1,
+                      ncol = 2, nrow = 2)
+  
+  # supplement plot
+  
+ 
+  
+  
+  # boxplot_3 <- sim |> subset_simulation(subset=3) |>
+  #   plot_eval("rare_prob_mse_gen") + ggtitle(titles[3]) + xlab(NULL) +
+  #   scale_y_log10()
+  
+  
+  # supp_plot <- plot_grid(boxplot_1, boxplot_3, ncol = 2, nrow = 1)
+  
+  return(plot_1)
+}
