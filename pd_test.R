@@ -93,6 +93,7 @@ print(sum(mins > 0)/nsims)
 
 df <- data.frame(lambda_min=mins)
 
+# Figure 10
 plot <- ggplot(df, aes(x=lambda_min)) + geom_boxplot() + coord_flip() +
   theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
   ylab("Minimum Eigenvalue")

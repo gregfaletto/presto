@@ -354,6 +354,88 @@ create_sparse_plot2 <- function(sim, plots=c(1,3)){
   return(plot_1)
 }
 
+create_sparse_plot2_ridge <- function(sim, plots){
+  require(cowplot)
+  require(ggplot2)
+
+  n_plots <- length(plots)
+
+  stopifnot(n_plots %in% c(1, 2))
+  
+  rare_probs <- round(100*rare_probs(sim), 3)
+  
+  titles <- paste("Rare Proportion: ", rare_probs, "%", sep="")
+
+  print("titles:")
+  print(titles)
+  
+  # main text plot
+  
+  if(n_plots == 2){
+    boxplot_2 <- sim |> subset_simulation(subset=plots[2]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[2]]) + xlab(NULL) +
+    scale_y_log10()
+  }
+  
+  
+  e_df <- as.data.frame(evals(sim))
+  stopifnot("rare_prob_mse_gen" %in% colnames(e_df))
+  stopifnot("prop_rare_obs" %in% colnames(e_df))
+  
+  ratio_plot_1 <- sim |> subset_simulation(subset=plots[1]) |> evals() |>
+    as.data.frame() |> plot_ratios_ridge(titles[plots[1]]) + xlab(NULL)
+  
+  if(n_plots == 2){
+    ratio_plot_2 <- sim |> subset_simulation(subset=plots[2]) |> evals() |>
+    as.data.frame() |> plot_ratios_ridge(titles[plots[2]]) + xlab(NULL)
+  }
+  
+  
+  boxplot_1 <- sim |> subset_simulation(subset=plots[1]) |>
+    plot_eval("rare_prob_mse_gen") + ggtitle(titles[plots[1]]) + xlab(NULL) +
+    scale_y_log10()
+  
+  if(n_plots == 2){
+    plot_1 <- plot_grid(boxplot_2, boxplot_1, ratio_plot_2, ratio_plot_1,
+                      ncol = 2, nrow = 2)
+    } else if(n_plots == 1){
+      plot_1 <- plot_grid(boxplot_1,ratio_plot_1,
+                      ncol = 2, nrow = 1)
+    }
+  
+
+  return(plot_1)
+}
+
+plot_ratios_ridge <- function(df, title, loss_name="rare_prob_mse_gen",
+                        ylab="MSE Ratio (PRESTO/Other)",
+                        meth_names=c("fused_polr", "logit_meth",
+                                     "prop_odds_meth", "fused_polr_l2")){
+  require(ggplot2)
+  presto_losses <- df[df$Method == meth_names[1], loss_name]
+  logit_losses <- df[df$Method == meth_names[2], loss_name]
+  po_losses <- df[df$Method == meth_names[3], loss_name]
+  presto_ridge_losses <- df[df$Method == meth_names[4], loss_name]
+
+  logit_ratio <- presto_losses/logit_losses
+  po_ratio <- presto_losses/po_losses
+  presto_ridge_ratio <- presto_losses/presto_ridge_losses
+  
+  n <- length(logit_ratio)
+  stopifnot(n == length(po_ratio))
+  
+  labels <- c(rep("Logit", n), rep("PO", n) , rep("PRESTO_L2", n))
+
+  df_gg <- data.frame(Labels=labels, MSE=c(logit_ratio, po_ratio, presto_ridge_ratio))
+
+  plot <- ggplot(df_gg, aes(x=Labels, y=MSE)) + geom_boxplot() +
+    ggtitle(title) + geom_hline(yintercept=1, color="red",
+                                      linetype="dashed") + ylab(ylab) +
+    scale_y_log10()
+
+  return(plot)
+}
+
 create_plot2 <- function(sim){
   require(cowplot)
   require(ggplot2)

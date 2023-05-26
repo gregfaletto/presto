@@ -46,7 +46,7 @@ set.seed(2390812)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 1
+     nsims <- 100
 } else{
      nsims <- 700
 }
@@ -85,38 +85,22 @@ dense_sim <- run_method(dense_sim, list(logit_meth, prop_odds_meth, fused_polr),
 
 dense_sim <- evaluate(dense_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
-# save_simulation(dense_sim)
+save_simulation(dense_sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-print(plot_eval(dense_sim, "rare_prob_mse_gen"))
+dense_plots_1_2 <- create_sparse_plots(dense_sim, plots=c(2, 3, 4))
 
-# # Plot functions
-# create_plots(dense_sim)
+# Figure 2
+fig_2 <- dense_plots_1_2$main_plot
 
-# df_sim_stats(dense_sim)
+# Figure 8
+fig_8 <- dense_plots_1_2$supp_plot
 
-dense_plots_1_2 <- create_sparse_plots(subset_simulation(dense_sim,
-     methods=c("logit_meth", "prop_odds_meth", "fused_polr")))
-
-# Figure 1 or 6;
-fig_6 <- dense_plots_1_2$main_plot
-
-# Figure 5 or 7;
-fig_7 <- dense_plots_1_2$supp_plot
-
-dense_plots_1_3 <- create_sparse_plots(subset_simulation(dense_sim,
-     methods=c("logit_meth", "prop_odds_meth", "fused_polr")), plots=c(2, 4, 6))
-
-# Figure 1 or 6;
-fig_1 <- dense_plots_1_3$main_plot
-
-# Figure 5 or 7;
-fig_5 <- dense_plots_1_3$supp_plot
-
-# create_plot2(dense_sim)
+# Figure 9
+fig_9 <- create_sparse_plot2(dense_sim, plots=1)
 
 ret <- df_sim_stats(dense_sim, methods_to_compare=c("logit_meth",
      "prop_odds_meth"))

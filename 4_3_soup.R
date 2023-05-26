@@ -99,7 +99,7 @@ t1 <- Sys.time()
 print(t1 - t0)
 
 # Create plot for paper (Figure 3)
-create_data_app_plots(sim)
+fig_3 <- create_data_app_plots(sim)
 
 # Generate sample means for paper (as reported in Section 4.3)
 df_data_app_stats(sim)

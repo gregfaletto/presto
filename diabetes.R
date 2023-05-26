@@ -91,9 +91,11 @@ print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-plot_eval_by(sim, "cal_osce_gen_data_app", varying = "age_cutoff") +
+# Figure 4
+fig_4 <- plot_eval_by(sim, "cal_osce_gen_data_app", varying = "age_cutoff") +
      xlab("Age cutoff") + ggtitle(NULL) + ylab("Estimated Rare Probability MSE")
 
+# Table 2
 tabulate_eval(sim, "cal_osce_gen_data_app", se_format="None",
      format_args=list(digits=3))
 

@@ -45,7 +45,7 @@ set.seed(2390812)
 n_cores <- 7
 stopifnot(n_cores <= detectCores())
 if(n_cores == 7){
-     nsims <- 1
+     nsims <- 100
 } else{
      nsims <- 700
 }
@@ -97,7 +97,7 @@ print("")
 
 sparse_sim <- evaluate(sparse_sim, list(prop_rare_obs, rare_prob_mse_gen))
 
-# save_simulation(sparse_sim)
+save_simulation(sparse_sim)
 
 print("Done! Total time for simulations:")
 t1 <- Sys.time()
@@ -106,34 +106,24 @@ print(t1 - t0)
 sparse_plots_1_2 <- create_sparse_plots(subset_simulation(sparse_sim,
      methods=c("logit_meth", "prop_odds_meth", "fused_polr")))
 
-# Figure 1 or 6;
+# Figure 6 (sparsity 1/2)
 fig_6 <- sparse_plots_1_2$main_plot
 
-# Figure 5 or 7;
+# Figure 7 (sparsity 1/2)
 fig_7 <- sparse_plots_1_2$supp_plot
 
 sparse_plots_1_3 <- create_sparse_plots(subset_simulation(sparse_sim,
      methods=c("logit_meth", "prop_odds_meth", "fused_polr")), plots=c(2, 4, 6))
 
-# Figure 1 or 6;
+# Figure 1 (sparsity 1/3)
 fig_1 <- sparse_plots_1_3$main_plot
 
-# Figure 5 or 7;
+# Figure 5 (sparsity 1/3)
 fig_5 <- sparse_plots_1_3$supp_plot
 
-
-
-# Need to figure out which plots to use for these two plots that include
-# ridge PRESTO; ALSO NEED TO FIGURE OUT TABLE TO MAKE
-create_sparse_plot2(sparse_sim, plots=c(3))
-
-create_sparse_plot2(sparse_sim, plots=c(4))
-
 ret <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
-     "prop_odds_meth", "fused_polr")),
-     methods_to_compare=c("logit_meth", "prop_odds_meth"
-          # , "lasso_logit"
-          ))
+     "prop_odds_meth", "fused_polr")), methods_to_compare=c("logit_meth",
+     "prop_odds_meth" ))
 
 # Table 3
 stargazer(ret$t_d_df, summary=FALSE)
@@ -141,18 +131,24 @@ stargazer(ret$t_d_df, summary=FALSE)
 # Table 4
 stargazer(ret$summary_df, summary=FALSE)
 
-# create_sparse_plots()
 
-# print(plot_eval(subset_simulation(sparse_sim, methods=c("logit_meth",
-#      "prop_odds_meth", "fused_polr")), "rare_prob_mse_gen"))
+# Ridge presto results
 
-# create_plots(subset_simulation(sparse_sim, methods=c("logit_meth",
-#      "prop_odds_meth", "fused_polr"))
+# Figure 10
+fig_10 <- create_sparse_plot2_ridge(sparse_sim, plots=1)
 
-# df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
-#      "prop_odds_meth", "fused_polr"))
+# Figure 11
+fig_11 <- create_sparse_plot2_ridge(sparse_sim, plots=2)
 
+ret_ridge <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
+     "prop_odds_meth", "fused_polr", "fused_polr_l2")),
+     methods_to_compare=c("logit_meth", "prop_odds_meth", "fused_polr_l2"))
 
+# Table 3
+stargazer(ret_ridge$t_d_df, summary=FALSE)
+
+# Table 4
+stargazer(ret_ridge$summary_df, summary=FALSE)
 
 
 
