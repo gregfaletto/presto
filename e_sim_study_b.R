@@ -1,7 +1,3 @@
-# setwd("/Users/gregfaletto/Dropbox/Jacob and Greg/AISTATS 2023")
-# Figure 8 (from Remark D.1) in the appendix of the version of the paper
-# submitted to ICML
-
 rm(list=ls())
 
 library(simulator)
@@ -9,19 +5,17 @@ library(MASS)
 library(ggplot2)
 library(parallel)
 
+# Ran on 7 cores in figures in paper
 n_cores <- detectCores() - 1
 
-# for all 6 settings, takes about one hour per simulation
+# for each setting, takes about one hour per simulation
 nsims <- 1
 
 n <- 10^6
 p <- 10
 
-# alpha <- c(0, 20)
 beta <- rep(1, p)
 K <- 3
-# corr <- 0
-# rare_prob <- 4*10^(-5)
 rare_prob <- 0
 bound <- 3
 
@@ -30,7 +24,7 @@ getRareIntcpt <- function(rare_prob, beta){
     stopifnot(length(beta) == p)
     param <- qlogis(1 - rare_prob)
     # on distribution bounded to [-bound, bound]^p, largest beta_max can be is
-    # beta %*% rep(5, p)
+    # beta %*% rep(bound, p)
     return(as.numeric(beta %*% rep(bound, p)) + param)
 }
 
@@ -62,7 +56,6 @@ eigensim_func <- function(n, p, rare_prob, beta, K, corr, nsim){
     if(rare_prob == !0){
         alpha[2] <- getRareIntcpt(rare_prob, beta)
     }
-
 
     ret_list <- list()
 
@@ -131,7 +124,7 @@ eigensim_func <- function(n, p, rare_prob, beta, K, corr, nsim){
         I_alpha_1_alpha_1_mean <- mean(I_alpha_1_alpha_1)
 
         mat <- I_beta_beta_mean - 2*outer(I_beta_alpha_1_mean,
-                                        I_beta_alpha_1_mean)/I_alpha_1_alpha_1_mean
+            I_beta_alpha_1_mean)/I_alpha_1_alpha_1_mean
 
         min_eigen <- min(eigen(mat)$values)
 
@@ -162,34 +155,6 @@ eigenmodel <- function(n, p, rare_prob, beta, K, corr) {
     )
     return(mod)
 }
-
-conf_int_agg_func <- function(ev){
-     stopifnot(is.list(ev))
-
-     values <- unlist(ev)
-     stopifnot(is.numeric(values))
-     n <- sum(!is.na(values))
-
-     se <- sd(values, na.rm=TRUE)/sqrt(n)
-
-     # print("max(values):")
-     # print(max(values))
-
-     # print("min(values):")
-     # print(min(values))
-     # print("se:")
-     # print(se)
-
-     margin <- se*qt(.975, df=n - 1)
-
-     # print("margin:")
-     # print(margin)
-
-     # return(margin)
-     return(se)
-}
-
-conf_int_agg <- new_aggregator("95% Margin of Error", conf_int_agg_func)
 
 eigenmethod <- new_method("eigenmethod", "Eigenvalue method",
     method = function(model, draw) {
@@ -223,27 +188,12 @@ eigeneval2 <- new_metric("eigeneval2", "Required Condition",
     }
 )
 
-eigeneval3 <- new_metric("eigeneval3", "Positive Definite",
-    metric = function(model, out) {
-        stopifnot(length(out$out) == 1)
-        stopifnot(is.numeric(out$out))
-
-        return(as.integer(out$out > 0))
-    }
-)
-
-
-# eigensim2
-# eigensim
-
 eigensim2 <- new_simulation("eigensim2", "Theorem 2.3 Assumption Simulation") |>
         generate_model(eigenmodel, n=n, p=p,
             rare_prob=as.list(c(0, 10^(seq(-7, -5, by=1)))),
             beta=rep(1, p), K=K
             , corr=as.list(c(0, 0.25, 0.5, 0.75)),
             vary_along=c("rare_prob", "corr")
-            # , corr= 0.75,
-            # vary_along=c("rare_prob")
             ) |> 
         simulate_from_model(nsim = nsims,
             , index = 1:n_cores
@@ -251,141 +201,98 @@ eigensim2 <- new_simulation("eigensim2", "Theorem 2.3 Assumption Simulation") |>
         run_method(list(eigenmethod)
             # , parallel = list(socket_names=n_cores)
             ) |> 
-        evaluate(list(eigeneval, eigeneval2, eigeneval3))
+        evaluate(list(eigeneval, eigeneval2))
 
 save_simulation(eigensim2)
 
-# eigensim <- load_simulation("eigensim")
-
-# plot_eval(eigensim2, "eigeneval")
-
-eigenplot4 <- plot_eval_by(eigensim2, "eigeneval", varying="rare_prob",
-    include_zero=TRUE
-    # , spread_aggregator=conf_int_agg
-    ) +
+# Figure 13
+fig_13 <- subset_simulation(eigensim2, corr==0) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
     scale_x_log10() +
-    # scale_y_log10() + 
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0")
+
+print(fig_13)
+
+# Figure 14
+fig_14 <- subset_simulation(eigensim2, corr==0.25) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.25")
+
+print(fig_14)
+
+# Figure 15
+fig_15 <- subset_simulation(eigensim2, corr==0.5) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+    include_zero=TRUE) +
+    scale_x_log10() +
+    geom_hline(yintercept=0, color="red", linetype="dashed") +
+    xlab("Rare Class Probability") + theme(legend.position="none") +
+    ggtitle("Correlation = 0.5")
+
+print(fig_15)
+
+# Figure 16
+fig_16 <- subset_simulation(eigensim2, corr==0.75) |>
+    plot_eval_by("eigeneval", varying="rare_prob",
+        include_zero=TRUE) +
+    scale_x_log10() +
     geom_hline(yintercept=0, color="red", linetype="dashed") +
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0.75")
 
-print(eigenplot4)
-
-eigenplot1 <- subset_simulation(eigensim, corr==0) |>
-    plot_eval_by("eigeneval", varying="rare_prob",
-    include_zero=TRUE) +
-    scale_x_log10() +
-    # scale_y_log10() + 
-    geom_hline(yintercept=0, color="red", linetype="dashed") +
-    xlab("Rare Class Probability") + theme(legend.position="none") +
-    ggtitle("Correlation = 0")
-
-print(eigenplot1)
-
-eigenplot2 <- subset_simulation(eigensim, corr==0.25) |>
-    plot_eval_by("eigeneval", varying="rare_prob",
-    include_zero=TRUE) +
-    scale_x_log10() +
-    # scale_y_log10() + 
-    geom_hline(yintercept=0, color="red", linetype="dashed") +
-    xlab("Rare Class Probability") + theme(legend.position="none") +
-    ggtitle("Correlation = 0.25")
-
-print(eigenplot2)
-
-eigenplot3 <- subset_simulation(eigensim, corr==0.5) |>
-    plot_eval_by("eigeneval", varying="rare_prob",
-    include_zero=TRUE) +
-    scale_x_log10() +
-    # scale_y_log10() + 
-    geom_hline(yintercept=0, color="red", linetype="dashed") +
-    xlab("Rare Class Probability") + theme(legend.position="none") +
-    ggtitle("Correlation = 0.5")
-
-print(eigenplot3)
-
-
-
-
+print(fig_16)
 
 # Plots for condition being satisfied
-cond_plot_1 <- subset_simulation(eigensim, corr==0) |>
+
+# Figure 17
+fig_17 <- subset_simulation(eigensim2, corr==0) |>
     plot_eval_by("eigeneval2", varying="rare_prob",
     include_zero=TRUE) +
     scale_x_log10() +
-    # scale_y_log10() + 
-    # geom_hline(yintercept=0, color="red", linetype="dashed") +
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0")
 
-print(cond_plot_1)
+print(fig_17)
 
-cond_plot_2 <- subset_simulation(eigensim, corr==0.25) |>
+# Figure 18
+fig_18 <- subset_simulation(eigensim2, corr==0.25) |>
     plot_eval_by("eigeneval2", varying="rare_prob",
     include_zero=TRUE) +
     scale_x_log10() +
-    # scale_y_log10() + 
-    # geom_hline(yintercept=0, color="red", linetype="dashed") +
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0.25")
 
-print(cond_plot_2)
+print(fig_18)
 
-cond_plot_3 <- subset_simulation(eigensim, corr==0.5) |>
+# Figure 19
+fig_19 <- subset_simulation(eigensim2, corr==0.5) |>
     plot_eval_by("eigeneval2", varying="rare_prob",
     include_zero=TRUE) +
     scale_x_log10() +
-    # scale_y_log10() + 
-    # geom_hline(yintercept=0, color="red", linetype="dashed") +
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0.5")
 
-print(cond_plot_3)
+print(fig_19)
 
-cond_plot_4 <- subset_simulation(eigensim, corr==0.75) |>
+# Figure 20
+fig_20 <- subset_simulation(eigensim2, corr==0.75) |>
     plot_eval_by("eigeneval2", varying="rare_prob",
     include_zero=TRUE) +
     scale_x_log10() +
-    # scale_y_log10() + 
-    # geom_hline(yintercept=0, color="red", linetype="dashed") +
     xlab("Rare Class Probability") + theme(legend.position="none") +
     ggtitle("Correlation = 0.75 ")
 
-print(cond_plot_4)
+print(fig_20)
 
 print("Total time:")
 print(Sys.time() - t0)
-
-# print("mean(mins):")
-# print(mean(mins))
-# print("sum(mins > 0)/nsims:")
-# print(sum(mins > 0)/nsims)
-
-# df <- data.frame(lambda_min=mins)
-
-# plot <- ggplot(df, aes(x=lambda_min)) + geom_boxplot() + coord_flip() +
-#   theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-#   ylab("Minimum Eigenvalue")
-
-# print(plot)
-
-# print("Standard error:")
-
-# se <- sd(mins)/sqrt(nsims)
-
-# print(se)
-
-# print("95% confidence interval:")
-
-# print(round(c(mean(mins) - qnorm(.975)*se, mean(mins) + qnorm(.975)*se), 5))
-
-# print("pi_rare:")
-
-# pi_rare <- prob(rep(-1, p), K)
-
-# print(pi_rare)
-
-
 
 
 

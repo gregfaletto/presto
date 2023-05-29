@@ -1,7 +1,3 @@
-# setwd("/Users/gregfaletto/Dropbox/Jacob and Greg/AISTATS 2023")
-# Figure 8 (from Remark D.1) in the appendix of the version of the paper
-# submitted to ICML
-
 rm(list=ls())
 
 library(ggplot2)
@@ -93,12 +89,12 @@ print(sum(mins > 0)/nsims)
 
 df <- data.frame(lambda_min=mins)
 
-# Figure 10
-plot <- ggplot(df, aes(x=lambda_min)) + geom_boxplot() + coord_flip() +
+# Figure 12
+fig_12 <- ggplot(df, aes(x=lambda_min)) + geom_boxplot() + coord_flip() +
   theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  ylab("Minimum Eigenvalue")
+  xlab("Minimum Eigenvalue")
 
-print(plot)
+print(gif_12)
 
 print("Standard error:")
 
