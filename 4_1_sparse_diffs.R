@@ -103,23 +103,23 @@ print("Done! Total time for simulations:")
 t1 <- Sys.time()
 print(t1 - t0)
 
-sparse_plots_1_2 <- create_sparse_plots(subset_simulation(sparse_sim,
+sparse_plots_1_3 <- create_sparse_plots(subset_simulation(sparse_sim,
      methods=c("logit_meth", "prop_odds_meth", "fused_polr")))
 
-# Figure 6 (sparsity 1/2)
-fig_6 <- sparse_plots_1_2$main_plot
+# Figure 6 (sparsity 1/3)
+fig_6 <- sparse_plots_1_3$main_plot
 
-# Figure 7 (sparsity 1/2)
-fig_7 <- sparse_plots_1_2$supp_plot
+# Figure 7 (sparsity 1/3)
+fig_7 <- sparse_plots_1_3$supp_plot
 
-sparse_plots_1_3 <- create_sparse_plots(subset_simulation(sparse_sim,
+sparse_plots_1_2 <- create_sparse_plots(subset_simulation(sparse_sim,
      methods=c("logit_meth", "prop_odds_meth", "fused_polr")), plots=c(2, 4, 6))
 
-# Figure 1 (sparsity 1/3)
-fig_1 <- sparse_plots_1_3$main_plot
+# Figure 1 (sparsity 1/2)
+fig_1 <- sparse_plots_1_2$main_plot
 
-# Figure 5 (sparsity 1/3)
-fig_5 <- sparse_plots_1_3$supp_plot
+# Figure 5 (sparsity 1/2)
+fig_5 <- sparse_plots_1_2$supp_plot
 
 ret <- df_sim_stats(subset_simulation(sparse_sim, methods=c("logit_meth",
      "prop_odds_meth", "fused_polr")), methods_to_compare=c("logit_meth",

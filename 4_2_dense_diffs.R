@@ -7,7 +7,6 @@ rm(list=ls())
 
 library(simulator)
 library(MASS)
-library(ordinalNet)
 library(parallel)
 library(cowplot)
 library(ggplot2)
