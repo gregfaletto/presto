@@ -1,5 +1,5 @@
 # presto
-Code for ["Predicting Rare Events by Shrinking Towards Proportional Odds"](https://gregoryfaletto.com/research/) (Faletto and Bien, 2023). Forthcoming at Fortieth International Conference on Machine Learning ([ICML 2023](https://icml.cc/)).
+Code for ["Predicting Rare Events by Shrinking Towards Proportional Odds"](https://arxiv.org/abs/2305.18700) (Faletto and Bien, 2023). Forthcoming at Fortieth International Conference on Machine Learning ([ICML 2023](https://icml.cc/)).
 
 In all data experiments, we implemented PRESTO by slightly modifying the code for `ordinalNet` (version 2.12); see Section H in the appendix of the paper for details, and see the modified code in this repo. In all cases, executing the code in this repo generates the exact plots that appear in the published version of the paper.
 
