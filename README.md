@@ -11,10 +11,14 @@ To get an implementation of PRESTO, save this repo, use `setwd()` to set your wo
 source("presto_func.R")
 ```
 After this, two functions will be available for you in implementing PRESTO:
-* The function `presto` fits the PRESTO model. Given a model matrix X and a response (ordered categorical variable) y, presto automatically selects a tuning paramter, then estimates the PRESTO model, returning the estimated coefficients.
+* The function `presto` fits the PRESTO model. Given a model matrix X and a response (ordered categorical variable) y, `presto` automatically selects a tuning paramter, then estimates the PRESTO model, returning the estimated coefficients.
 * The function `predictPrestoProbs` estimates class probabilities on a test data set, given the output of `presto`.
 
-Read the comments of `presto_func.R` for more documentation details. **See the file `example_code.R` for code illustrating how to use these functions.**
+Read the comments of `presto_func.R` for more documentation details. **See the file `example_code.R` for code illustrating how to use these functions:**
+
+```
+source("example_code.R")
+```
 
 # Details on data experiments from paper
 
